@@ -1,0 +1,71 @@
+/**********************************************************
+ *  CAnt.h
+ *
+ *  Created on: 17 dec. 2021
+ *      Author: <Nom> <Prenom>
+ *
+ **********************************************************/
+
+#include <defines.h>
+#include "CAnt.h"
+#include "CPheromone.h"
+#include "CScene.h"
+
+CAnt::CAnt(const SDL_Rect&frame, const SDL_Point&speed, const SDL_Color&color) :
+	CObject(frame, speed, color)
+{}
+
+CAnt::~CAnt() {}
+
+void CAnt::Draw(SDL_Renderer*pRenderer)const{
+	/**********************************************************************
+	 * ToDo: Draw an ant object.
+	 */
+	SDL_SetRenderDrawColor(pRenderer, m_color.r, m_color.g, m_color.b, m_color.a);
+	SDL_RenderFillRect(pRenderer, &m_frame);
+}
+
+int CAnt::Animate(SDL_Rect*pArea){
+	/**********************************************************************
+	 * ToDo: Animate an ant object.
+	 * 		 Process pheromone detection and action consequently.
+	 * 		 Change the return statement to conform description
+	 * 		 towards pArea limits.
+	 */
+
+	m_frame.x += m_speed.x;
+	m_frame.y += m_speed.y;
+
+	CPheromone* pPheromone = c_pScene->HasPheromoneAt(m_center);
+
+	if(pPheromone){
+		pPheromone->IncreaseTTL(APP_PHEROMONE_TTL_INC_VAL);
+		m_speed.x = pPheromone->GetSpeed().x;
+		m_speed.y = pPheromone->GetSpeed().y;
+	}
+	else{
+		c_pScene->AddPheromone(SDL_Rect{m_frame.x + m_frame.w/2,
+					m_frame.y + m_frame.h/2,
+					APP_PHEROMONE_SIZE,APP_PHEROMONE_SIZE},
+					m_speed);
+
+	}
+	m_speed.x = pPheromone->GetSpeed().x;
+			m_speed.y = pPheromone->GetSpeed().y;
+
+
+	return !SDL_HasIntersection(pArea, &m_frame);
+}
+
+
+
+CScene*CAnt::c_pScene=nullptr;
+
+int CAnt::InitGraphics(CScene*pScene){
+	c_pScene=pScene;
+	return 0;
+}
+
+int CAnt::ReleaseGraphics(){
+	return 0;
+}

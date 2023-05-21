@@ -1,0 +1,47 @@
+/**********************************************************
+ *  CObject.cpp
+ *
+ *  Created on: 17 dec. 2021
+ *      Author: <Nom> <Prenom>
+ *
+ **********************************************************/
+
+#include "CObject.h"
+
+CObject::CObject() :
+	m_frame{0},
+	m_center{0},
+	m_speed{0},
+	m_color{0}
+{}
+
+CObject::CObject(const SDL_Rect&frame, const SDL_Point&speed, const SDL_Color&color) :
+	m_frame(frame),
+	m_center{frame.x+frame.w/2, frame.y+frame.h/2},
+	m_speed(speed),
+	m_color(color)
+{}
+
+
+CObject::CObject(const CObject& other):
+	m_frame(other.m_frame),
+	m_center{other.m_frame.x+other.m_frame.w/2, other.m_frame.y+other.m_frame.h/2},
+	m_speed(other.m_speed),
+	m_color(other.m_color)
+{}
+
+CObject::~CObject() {}
+
+
+int CObject::IsThisObjectAt(SDL_Point*pAt) const{
+	SDL_Rect r{pAt->x-2, pAt->y-1, 3, 2};
+	return SDL_HasIntersection(&r, &m_frame);
+}
+
+int CObject::IsThisObjectType(size_t hashCode) const{
+	return typeid(*this).hash_code()==hashCode;
+}
+
+SDL_Point CObject::GetLocation() const { return SDL_Point{m_frame.x, m_frame.y }; }
+SDL_Point CObject::GetCenter() const { return m_center; }
+SDL_Point CObject::GetSpeed() const { return m_speed; }
